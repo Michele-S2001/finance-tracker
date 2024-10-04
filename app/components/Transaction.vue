@@ -2,7 +2,7 @@
   <div class="grid grid-cols-2 py-4 border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <UIcon name="i-heroicons-arrow-up-right" class="text-green-600"/>
+        <UIcon :name="icon" :class="[iconColor]"/>
         <div>{{ transaction.description }}</div>
       </div>
       <div v-if="transaction.category">
@@ -24,6 +24,12 @@
 const { transaction } = defineProps({
   transaction: Object
 })
+
+const isIncome = computed(() => transaction.type.toLowerCase() ===  'income')
+
+const icon = computed(() => isIncome.value ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-left')
+
+const iconColor = computed(() => isIncome.value ? 'text-green-600' : 'text-red-600')
 
 const { currency } = useCurrency(transaction.amount)
 
