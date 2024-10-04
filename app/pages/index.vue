@@ -7,10 +7,10 @@
   </section>
 
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
-    <Trend color="green" title="Income" :amount="4000" :last-amount="3000" :loading="false" />
-    <Trend color="red" title="Income" :amount="4000" :last-amount="3000" :loading="false" />
-    <Trend color="green" title="Income" :amount="4000" :last-amount="3000" :loading="false" />
-    <Trend color="red" title="Income" :amount="4000" :last-amount="3000" :loading="true" />
+    <Trend xcolor="red" title="Income" :amount="6000" :last-amount="6000" :loading="false" />
+    <Trend xcolor="red" title="Expense" :amount="1200" :last-amount="2000" :loading="false" />
+    <Trend xcolor="red" title="Investments" :amount="3400" :last-amount="3000" :loading="false" />
+    <Trend xcolor="red" title="Savings" :amount="3700" :last-amount="6000" :loading="false" />
   </section ection>
 </template>
 
