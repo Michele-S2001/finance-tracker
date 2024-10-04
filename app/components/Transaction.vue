@@ -25,6 +25,8 @@ const { transaction } = defineProps({
   transaction: Object
 })
 
+const emit = defineEmits(['deleted'])
+
 // proprietà calcolate in base al tipo di transazione
 const isIncome = computed(() => transaction.type.toLowerCase() ===  'income')
 const icon = computed(() => isIncome.value ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-left')
@@ -39,7 +41,6 @@ const supabase = useSupabaseClient()
 
 const deleteTransaction = async () => {
   isLoading.value = true
-  console.log('cancella');
   
   try {
     await supabase
@@ -51,6 +52,7 @@ const deleteTransaction = async () => {
       icon: 'i-heroicons-check-circle',
       color: 'green'
     })
+    emit('deleted', transaction.id)
   } catch(err) {
     toast.add({
       title: 'Transaction deleted',
