@@ -59,6 +59,4 @@ const transactionsGroupByDate = computed(() => {
   return grouped
 })
 
-console.log(transactionsGroupByDate.value)
-
 </script> 
