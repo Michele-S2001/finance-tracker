@@ -11,7 +11,7 @@
     <Trend xcolor="red" title="Expense" :amount="1200" :last-amount="2000" :loading="false" />
     <Trend xcolor="red" title="Investments" :amount="3400" :last-amount="3000" :loading="false" />
     <Trend xcolor="red" title="Savings" :amount="3700" :last-amount="6000" :loading="false" />
-  </section ection>
+  </section>
 </template>
 
 <script setup>
