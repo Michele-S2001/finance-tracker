@@ -7,10 +7,20 @@
   </section>
 
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
-    <Trend xcolor="red" title="Income" :amount="6000" :last-amount="6000" :loading="isLoading" />
-    <Trend xcolor="red" title="Expense" :amount="1200" :last-amount="2000" :loading="isLoading" />
+    <Trend xcolor="red" title="Income" :amount="incomeTotal" :last-amount="1000" :loading="isLoading" />
+    <Trend xcolor="red" title="Expense" :amount="expenseTotal" :last-amount="3800" :loading="isLoading" />
     <Trend xcolor="red" title="Investments" :amount="3400" :last-amount="3000" :loading="isLoading" />
     <Trend xcolor="red" title="Savings" :amount="3700" :last-amount="6000" :loading="isLoading" />
+  </section>
+
+  <section class="flex justify-between mb-10">
+    <div>
+      <h2 class="text-2xl font-extrabold">Transactions</h2>
+      <div class="text-gray-500">You have {{ incomeCount }} incomes and {{ expenseCount }} expenses this period </div>
+    </div>
+    <div>
+      <UButton icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add"/>
+    </div>
   </section>
 
   <section v-if="!isLoading">
@@ -18,8 +28,9 @@
       <DailyTransactionSummary :date="date" :transactions="transactionsOnDay" />
       <Transaction v-for="transaction in transactionsOnDay" :key="transaction.id" :transaction="transaction" @deleted="refreshTransactions"/>
     </div>
-    <!--  -->
   </section>
+
+
   <section v-else>
     <USkeleton class="h-8 w-full mb-2" v-for="i in 4" :key="i"/>
   </section>
@@ -32,6 +43,25 @@ const selectedView = ref(transactionViewOptions[1])
 const transactions = ref([])
 const isLoading = ref(false)
 const supabase = useSupabaseClient()
+
+const income = computed(
+  () => transactions.value.filter((t) => t.type === 'Income')
+)
+
+const expence = computed(
+  () => transactions.value.filter((t) => t.type === 'Expense')
+)
+
+const incomeCount = computed(() => income.value.length)
+const expenseCount = computed(() => expence.value.length)
+
+const incomeTotal = computed(
+  () => income.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+)
+
+const expenseTotal = computed(
+  () => expence.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+)
 
 const fetchTransactions = async () => {
   isLoading.value = true

@@ -20,11 +20,10 @@
 
 <script setup>
 
-const { title, amount, lastAmount, xcolor, loading } = defineProps({
+const { title, amount, lastAmount, loading } = defineProps({
   title: String,
   amount: Number,
   lastAmount: Number,
-  xcolor: String, 
   loading: Boolean
 })
 
