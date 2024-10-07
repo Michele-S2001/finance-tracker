@@ -19,7 +19,7 @@
       <div class="text-gray-500">You have {{ incomeCount }} incomes and {{ expenseCount }} expenses this period </div>
     </div>
     <div>
-      <TransactionModal v-model="isOpen" />
+      <TransactionModal v-model="isOpen" @saved="refreshTransactions"/>
       <UButton @click="isOpen = true" icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add"/>
     </div>
   </section>

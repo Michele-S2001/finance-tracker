@@ -26,7 +26,7 @@
         <UFormGroup :required="true" label="Category" name="category" class="mb-4" v-if="state.type === 'Expense'">
           <USelect placeholder="Category" :options="categories" v-model="state.category"/>
         </UFormGroup>
-        <UButton type="submit" color="black" variant="solid" label="Save"/>
+        <UButton type="submit" color="black" variant="solid" label="Save" :loading="isLoading"/>
       </UForm>
     </UCard>
   </UModal>
@@ -36,12 +36,43 @@
 import { categories, types } from '~~/costants';
 import { z } from 'zod'
 
+const emit = defineEmits(['saved'])
+
 const isOpen = defineModel()
 const form = ref()
+const isLoading = ref(false)
+const supabase = useSupabaseClient()
+const toast = useToast()
 
 const save = async () => {
   if (form.value.errors.length) return
-  // store into supabase
+  isLoading.value = true
+  try {
+    const { error } = await supabase
+      .from('transactions')
+      .upsert(state.value)
+
+    if(!error) {
+      toast.add({
+        title: 'Transaction saved',
+        icon: 'i-heroicons-check-circle'
+      })
+      isOpen.value = false
+      emit('saved')
+      return
+    }
+    throw error
+  } catch(e) {
+    console.error('Transaction not saved something went wrong', e.message)
+    toast.add({
+      title: 'Transaction not saved',
+      description: e.message,
+      color: 'red',
+      icon: 'i-heroicons-exclamation-circle'
+    })
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const defaultSchema = z.object({
