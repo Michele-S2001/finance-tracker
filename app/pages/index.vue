@@ -8,8 +8,8 @@
 
   <!-- Start trends indicator section -->
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
-    <Trend xcolor="red" title="Income" :amount="incomeTotal" :last-amount="1000" :loading="pending" />
-    <Trend xcolor="red" title="Expense" :amount="expenseTotal" :last-amount="3800" :loading="pending" />
+    <Trend xcolor="red" title="Income" :amount="incomeTotal" :last-amount="previousIncomeTotal" :loading="pending" />
+    <Trend xcolor="red" title="Expense" :amount="expenseTotal" :last-amount="previousExpenseTotal" :loading="pending" />
     <Trend xcolor="red" title="Investments" :amount="3000" :last-amount="3000" :loading="pending" />
     <Trend xcolor="red" title="Savings" :amount="3700" :last-amount="6000" :loading="pending" />
   </section>
@@ -47,7 +47,7 @@ import { transactionViewOptions } from '~~/costants';
 
 const selectedView = ref(transactionViewOptions[1])
 const isOpen = ref(false)
-const dates = useSelectedTimePeriod(selectedView)
+const { current, previous } = useSelectedTimePeriod(selectedView)
 
 const { pending, refresh, transactions: {
   all,
@@ -58,8 +58,12 @@ const { pending, refresh, transactions: {
   grouped: {
     byDate
   }
-} } = useFetchTransactions()
-
+} } = useFetchTransactions(current)
 await refresh()
 
-</script> 
+const {refresh: refreshPrev,  transactions: {
+  incomeTotal: previousIncomeTotal,
+  expenseTotal: previousExpenseTotal,
+} } = useFetchTransactions(previous)
+await refreshPrev()
+</script>

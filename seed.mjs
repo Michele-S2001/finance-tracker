@@ -22,7 +22,7 @@ async function seedTransactions() {
   let transactions = []
 
   for (let year = new Date().getFullYear(); year > new Date().getFullYear() - 2; year--) {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 30; i++) {
       const date = new Date(
         year,
         faker.number.int({ min: 0, max: 11 }),
