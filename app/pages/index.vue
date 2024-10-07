@@ -9,7 +9,7 @@
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
     <Trend xcolor="red" title="Income" :amount="incomeTotal" :last-amount="1000" :loading="isLoading" />
     <Trend xcolor="red" title="Expense" :amount="expenseTotal" :last-amount="3800" :loading="isLoading" />
-    <Trend xcolor="red" title="Investments" :amount="3400" :last-amount="3000" :loading="isLoading" />
+    <Trend xcolor="red" title="Investments" :amount="investmentTotal" :last-amount="3000" :loading="isLoading" />
     <Trend xcolor="red" title="Savings" :amount="3700" :last-amount="6000" :loading="isLoading" />
   </section>
 
@@ -54,6 +54,16 @@ const expence = computed(
   () => transactions.value.filter((t) => t.type === 'Expense')
 )
 
+// AGGIUNTE IO, DA VEDERE LUI COSA FA NEL CORSO
+const investment = computed(
+  () => transactions.value.filter((t) => t.type === 'Investment')
+)
+
+const saving = computed(
+  () => transactions.value.filter((t) => t.type === 'Saving')
+)
+//-------------------------------------------
+
 const incomeCount = computed(() => income.value.length)
 const expenseCount = computed(() => expence.value.length)
 
@@ -65,6 +75,16 @@ const expenseTotal = computed(
   () => expence.value.reduce((sum, transaction) => sum + transaction.amount, 0)
 )
 
+// AGGIUNTE IO, DA VEDERE LUI COSA FA NEL CORSO
+const investmentTotal = computed(
+  () => investment.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+)
+
+const savingTotal = computed(
+  () => saving.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+)
+//-------------------------------------------
+
 const fetchTransactions = async () => {
   isLoading.value = true
   try {
@@ -72,11 +92,12 @@ const fetchTransactions = async () => {
       const { data, error } = await supabase
         .from('transactions')
         .select()
+        .order('created_at', { ascending: false })
     
         if(error) return []
-    
+        
         return data
-    })
+    }) 
     return data.value
   } finally {
     isLoading.value = false
@@ -101,6 +122,20 @@ const transactionsGroupByDate = computed(() => {
       grouped[date].push(transaction)
     }
   }
+
+  /**
+   * Metodo front-end side per ordinare 
+   * le transaction per data dalla più recente
+   * 
+   * const sortedKeys = Object.keys(grouped).sort().reverse()
+   * const sortedGroup = {}
+   * 
+   * for(const key of sortedKeys) {
+   *  sortedGrouped[key] = groped[key]
+   * }
+   * 
+   * return sortedGroup
+   */
 
   return grouped
 })
