@@ -5,7 +5,7 @@
         Add Transaction
       </template> 
 
-      <UForm :state="state">
+      <UForm :state="state" :schema="schema" ref="form" @submit="save">
         <!-- Transaction type -->
         <UFormGroup :required="true" label="Transaction Type" name="type" class="mb-4">
           <USelect placeholder="Select the transaction type" :options="types" v-model="state.type"/>
@@ -23,10 +23,10 @@
           <UInput placeholder="Description" v-model="state.description"/>
         </UFormGroup>
         <!-- Category -->
-        <UFormGroup :required="true" label="Category" name="category" class="mb-4">
+        <UFormGroup :required="true" label="Category" name="category" class="mb-4" v-if="state.type === 'Expense'">
           <USelect placeholder="Category" :options="categories" v-model="state.category"/>
         </UFormGroup>
-        <UButton type="submit" color="black" variant="solid" label="Save" />
+        <UButton type="submit" color="black" variant="solid" label="Save"/>
       </UForm>
     </UCard>
   </UModal>
@@ -34,8 +34,42 @@
 
 <script setup>
 import { categories, types } from '~~/costants';
+import { z } from 'zod'
 
 const isOpen = defineModel()
+const form = ref()
+
+const save = async () => {
+  form.value.validate()
+}
+
+const defaultSchema = z.object({
+  created_at: z.string('A data is required'),
+  description: z.string().optional(),
+  amount: z.number().positive('Amount needs to be more than 0')
+}) 
+
+const incomeSchema = z.object({
+  type: z.literal('Income')
+})
+
+const expenseSchema = z.object({
+  type: z.literal('Expence'),
+  category: z.enum(categories)
+})
+
+const investmentSchema = z.object({
+  type: z.literal('Investment')
+})
+
+const savingSchema = z.object({
+  type: z.literal('Saving')
+})
+
+const schema = z.intersection(
+  z.discriminatedUnion('type', [incomeSchema, expenseSchema, investmentSchema, savingSchema]),
+  defaultSchema
+)
 
 const state = ref({
   type: undefined,
