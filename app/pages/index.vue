@@ -7,10 +7,10 @@
   </section>
 
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
-    <Trend xcolor="red" title="Income" :amount="incomeTotal" :last-amount="1000" :loading="isLoading" />
-    <Trend xcolor="red" title="Expense" :amount="expenseTotal" :last-amount="3800" :loading="isLoading" />
-    <Trend xcolor="red" title="Investments" :amount="investmentTotal" :last-amount="3000" :loading="isLoading" />
-    <Trend xcolor="red" title="Savings" :amount="3700" :last-amount="6000" :loading="isLoading" />
+    <Trend xcolor="red" title="Income" :amount="incomeTotal" :last-amount="1000" :loading="pending" />
+    <Trend xcolor="red" title="Expense" :amount="expenseTotal" :last-amount="3800" :loading="pending" />
+    <Trend xcolor="red" title="Investments" :amount="3000" :last-amount="3000" :loading="pending" />
+    <Trend xcolor="red" title="Savings" :amount="3700" :last-amount="6000" :loading="pending" />
   </section>
 
   <section class="flex justify-between mb-10">
@@ -19,15 +19,15 @@
       <div class="text-gray-500">You have {{ incomeCount }} incomes and {{ expenseCount }} expenses this period </div>
     </div>
     <div>
-      <TransactionModal v-model="isOpen" @saved="refreshTransactions"/>
+      <TransactionModal v-model="isOpen" @saved="refresh()"/>
       <UButton @click="isOpen = true" icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add"/>
     </div>
   </section>
 
-  <section v-if="!isLoading">
-    <div v-for="(transactionsOnDay, date) in transactionsGroupByDate" :key="date" class="mb-10">
+  <section v-if="!pending">
+    <div v-for="(transactionsOnDay, date) in byDate" :key="date" class="mb-10">
       <DailyTransactionSummary :date="date" :transactions="transactionsOnDay" />
-      <Transaction v-for="transaction in transactionsOnDay" :key="transaction.id" :transaction="transaction" @deleted="refreshTransactions"/>
+      <Transaction v-for="transaction in transactionsOnDay" :key="transaction.id" :transaction="transaction" @deleted="refresh()"/>
     </div>
   </section>
 
@@ -41,109 +41,18 @@
 import { transactionViewOptions } from '~~/costants';
 
 const selectedView = ref(transactionViewOptions[1])
-const transactions = ref([])
-const isLoading = ref(false)
-const supabase = useSupabaseClient()
 const isOpen = ref(false)
 
-const income = computed(
-  () => transactions.value.filter((t) => t.type === 'Income')
-)
-
-const expence = computed(
-  () => transactions.value.filter((t) => t.type === 'Expense')
-)
-
-// AGGIUNTE IO, DA VEDERE LUI COSA FA NEL CORSO
-const investment = computed(
-  () => transactions.value.filter((t) => t.type === 'Investment')
-)
-
-const saving = computed(
-  () => transactions.value.filter((t) => t.type === 'Saving')
-)
-//-------------------------------------------
-
-const incomeCount = computed(() => income.value.length)
-const expenseCount = computed(() => expence.value.length)
-
-const incomeTotal = computed(
-  () => income.value.reduce((sum, transaction) => sum + transaction.amount, 0)
-)
-
-const expenseTotal = computed(
-  () => expence.value.reduce((sum, transaction) => sum + transaction.amount, 0)
-)
-
-// AGGIUNTE IO, DA VEDERE LUI COSA FA NEL CORSO
-const investmentTotal = computed(
-  () => investment.value.reduce((sum, transaction) => sum + transaction.amount, 0)
-)
-
-const savingTotal = computed(
-  () => saving.value.reduce((sum, transaction) => sum + transaction.amount, 0)
-)
-//-------------------------------------------
-
-const fetchTransactions = async () => {
-  isLoading.value = true
-  try {
-    const { data } = await useAsyncData('transactions', async () => {
-      const { data, error } = await supabase
-        .from('transactions')
-        .select()
-        .order('created_at', { ascending: false })
-    
-        if (error) {
-          console.error("Error fetching transactions:", error.message)
-          return []
-        }
-        return data
-    }) 
-    return data.value || []
-    
-  } catch(err) {
-    console.error("An error occurred:", err.message)
-    return []
-  } finally {
-    isLoading.value = false
+const { pending, refresh, transactions: {
+  incomeCount,
+  expenseCount,
+  incomeTotal,
+  expenseTotal,
+  grouped: {
+    byDate
   }
-}
+} } = useFetchTransactions()
 
-const refreshTransactions = async () => transactions.value = await fetchTransactions()
-
-await refreshTransactions()
-
-const transactionsGroupByDate = computed(() => {
-  let grouped = {}
-
-  if(transactions.length !== 0) {
-    for(const transaction of transactions.value) {
-      const date = new Date(transaction.created_at).toISOString().split('T')[0]
-
-      if(!grouped[date]) {
-        grouped[date] = []
-      }
-
-      grouped[date].push(transaction)
-    }
-  }
-
-  /**
-   * Metodo front-end side per ordinare 
-   * le transaction per data dalla più recente
-   * 
-   * const sortedKeys = Object.keys(grouped).sort().reverse()
-   * const sortedGroup = {}
-   * 
-   * for(const key of sortedKeys) {
-   *  sortedGrouped[key] = groped[key]
-   * }
-   * 
-   * return sortedGroup
-   */
-
-  return grouped
-})
+await refresh()
 
 </script> 
