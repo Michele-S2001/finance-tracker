@@ -40,7 +40,8 @@ const isOpen = defineModel()
 const form = ref()
 
 const save = async () => {
-  form.value.validate()
+  if (form.value.errors.length) return
+  // store into supabase
 }
 
 const defaultSchema = z.object({
@@ -54,7 +55,7 @@ const incomeSchema = z.object({
 })
 
 const expenseSchema = z.object({
-  type: z.literal('Expence'),
+  type: z.literal('Expense'),
   category: z.enum(categories)
 })
 
@@ -71,11 +72,26 @@ const schema = z.intersection(
   defaultSchema
 )
 
-const state = ref({
+const initialState = {
   type: undefined,
   amount: 0,
   created_at: undefined,
   description: undefined,
   category: undefined
+}
+
+const state = ref({
+  ...initialState
 })
+
+const resetForm = () => {
+  Object.assign(state.value, initialState)
+  form.value.clear()
+}
+
+watch(isOpen, (newVal) => {
+  if (!newVal) {
+    resetForm();
+  }
+});
 </script>
