@@ -94,11 +94,17 @@ const fetchTransactions = async () => {
         .select()
         .order('created_at', { ascending: false })
     
-        if(error) return []
-        
+        if (error) {
+          console.error("Error fetching transactions:", error.message)
+          return []
+        }
         return data
     }) 
-    return data.value
+    return data.value || []
+    
+  } catch(err) {
+    console.error("An error occurred:", err.message)
+    return []
   } finally {
     isLoading.value = false
   }
