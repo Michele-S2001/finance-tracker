@@ -2,7 +2,7 @@
   <div>
     <div class="mb-4">
       <UFormGroup label="Current avatar" class="w-full" help="This would be blank by default">
-        <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" size="3xl" />
+        <UAvatar :src="url" size="3xl" />
       </UFormGroup>
     </div>
     <div class="mb-4">
@@ -19,6 +19,7 @@
 <script setup>
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const { url } = useAvatarUrl()
 const { toastSuccess, toastError } = useAppToast()
 
 const uploading = ref(false)
@@ -33,6 +34,7 @@ const saveAvatar = async () => {
     return
   }
 
+  // Crea un nome unico casuale
   const fileExt = file.name.split(".").pop()
   const fileName = `${Math.random()}.${fileExt}`
 
@@ -55,7 +57,7 @@ const saveAvatar = async () => {
       }
     })
 
-    // 4. (FACOLTATIVO) rimuovi il vecchio file avatar
+    // 4. Rimuovi il vecchio file avatar
     if (currentAvatarUrl) {
       const { error } = await supabase.storage
         .from('avatars')
