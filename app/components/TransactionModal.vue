@@ -42,7 +42,7 @@ const isOpen = defineModel()
 const form = ref()
 const isLoading = ref(false)
 const supabase = useSupabaseClient()
-const toast = useToast()
+const { toastSuccess, toastError } = useAppToast()
 
 const save = async () => {
   if (form.value.errors.length) return
@@ -53,10 +53,7 @@ const save = async () => {
       .upsert(state.value)
 
     if(!error) {
-      toast.add({
-        title: 'Transaction saved',
-        icon: 'i-heroicons-check-circle'
-      })
+      toastSuccess({ title: 'Transaction saved' })
       isOpen.value = false
       emit('saved')
       return
@@ -64,11 +61,9 @@ const save = async () => {
     throw error
   } catch(e) {
     console.error('Transaction not saved something went wrong', e.message)
-    toast.add({
+    toastError({
       title: 'Transaction not saved',
-      description: e.message,
-      color: 'red',
-      icon: 'i-heroicons-exclamation-circle'
+      description: e.message
     })
   } finally {
     isLoading.value = false

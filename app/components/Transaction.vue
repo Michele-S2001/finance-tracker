@@ -36,7 +36,7 @@ const { currency } = useCurrency(transaction.amount)
 
 // logica per l'eliminazione di una transaction
 const isLoading = ref(false)
-const toast = useToast()
+const { toastSuccess, toastError } = useAppToast()
 const supabase = useSupabaseClient()
 
 const deleteTransaction = async () => {
@@ -47,18 +47,10 @@ const deleteTransaction = async () => {
       .from('transactions')
       .delete()
       .eq('id', transaction.id)
-    toast.add({
-      title: 'Transaction deleted',
-      icon: 'i-heroicons-check-circle',
-      color: 'green'
-    })
+    toastSuccess({ title: 'Transaction deleted' })
     emit('deleted', transaction.id)
   } catch(err) {
-    toast.add({
-      title: 'Transaction deleted',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'red'
-    })
+    toastError({ title: 'Transaction deleted' })
   } finally {
     isLoading.value = false
   }
