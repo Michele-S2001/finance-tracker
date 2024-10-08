@@ -8,7 +8,7 @@
       <UInput v-model="state.email" />
     </UFormGroup>
 
-    <UButton type="submit" color="black" variant="solid" label="Save" :laoding="pending" :disabled="pending"/> 
+    <UButton type="submit" color="black" variant="solid" label="Save" :loading="pending" :disabled="pending"/> 
   </UForm>
 </template>
 
