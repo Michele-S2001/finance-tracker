@@ -19,14 +19,14 @@
 <script setup>
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-// We need to get the actual avatar URL
 const { toastSuccess, toastError } = useAppToast()
+
 const uploading = ref(false)
-const fileInput = ref() // Reference to an input with ref="fileInput" attribute
+const fileInput = ref() 
 
 const saveAvatar = async () => {
-  // 1. Get the uploaded file
-  //    a) If no file uploaded, show toast error
+  // 1. Ottieni il file caricato
+  //    a) Se nessun file è stato caricato, mostra un errore
   const file = fileInput.value.input.files[0]
   if (!file) {
     toastError({ title: 'Select a file to upload first'})
@@ -38,32 +38,32 @@ const saveAvatar = async () => {
 
   try {
     uploading.value = true
-    // 1. Grab the current avatar URL
+    // 1. Ottieni l'URL corrente dell'avatar
     const currentAvatarUrl = user.value.user_metadata?.avatar_url
     
-    // 2. Upload the image to avatars bucket
+    // 2. Carica l'immagine nel bucket degli avatar
     const { error } = await supabase.storage
       .from('avatars')
       .upload(fileName, file)
       
-    if(error) throw error
+    if (error) throw error
 
-    // 3. Update the user metadata with the avatar URL
+    // 3. Aggiorna i metadati dell'utente con l'URL dell'avatar
     await supabase.auth.updateUser({
       data: {
         avatar_url: fileName
       }
     })
 
-    // 4. (OPTIONALLY) remove the old avatar file
-    if(currentAvatarUrl) {
+    // 4. (FACOLTATIVO) rimuovi il vecchio file avatar
+    if (currentAvatarUrl) {
       const { error } = await supabase.storage
         .from('avatars')
         .remove([currentAvatarUrl])
-      if(error) throw error
+      if (error) throw error
     }
 
-    // 5. Reset the file input
+    // 5. Resetta l'input del file
     fileInput.value.input.value = null
       
     toastSuccess({
