@@ -2,13 +2,13 @@
   <UModal v-model="isOpen">
     <UCard>
       <template #header>
-        Add Transaction
+        {{ isEditing ? 'Edit' : 'Add' }} Transaction
       </template> 
 
       <UForm :state="state" :schema="schema" ref="form" @submit="save">
         <!-- Transaction type -->
         <UFormGroup :required="true" label="Transaction Type" name="type" class="mb-4">
-          <USelect placeholder="Select the transaction type" :options="types" v-model="state.type"/>
+          <USelect :disabled="isEditing" placeholder="Select the transaction type" :options="types" v-model="state.type"/>
         </UFormGroup>
         <!-- Amount -->
         <UFormGroup label="Amount" :required="true" name="amount" class="mb-4">
@@ -37,6 +37,14 @@ import { categories, types } from '~~/costants';
 import { z } from 'zod'
 
 const emit = defineEmits(['saved'])
+const { transaction } = defineProps({
+  transaction: {
+    type: Object,
+    required: false
+  }
+})
+
+const isEditing = computed(() => !!transaction)
 
 const isOpen = defineModel()
 const form = ref()
@@ -50,7 +58,10 @@ const save = async () => {
   try {
     const { error } = await supabase
       .from('transactions')
-      .upsert(state.value)
+      .upsert({
+        ...state.value,
+        id: transaction?.id
+      })
 
     if(!error) {
       toastSuccess({ title: 'Transaction saved' })
@@ -106,9 +117,13 @@ const initialState = {
   category: undefined
 }
 
-const state = ref({
-  ...initialState
-})
+const state = ref(isEditing.value ? {
+  type: transaction.type,
+  amount: transaction.amount,
+  created_at: transaction.created_at,
+  description: transaction.description,
+  category: transaction.category
+} : { ...initialState })
 
 const resetForm = () => {
   Object.assign(state.value, initialState)
