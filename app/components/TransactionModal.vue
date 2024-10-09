@@ -109,7 +109,13 @@ const schema = z.intersection(
   defaultSchema
 )
 
-const initialState = {
+const initialState = isEditing.value ? {
+  type: transaction.type,
+  amount: transaction.amount,
+  created_at: transaction.created_at.split('T')[0],
+  description: transaction.description,
+  category: transaction.category
+} : {
   type: undefined,
   amount: 0,
   created_at: undefined,
@@ -117,13 +123,7 @@ const initialState = {
   category: undefined
 }
 
-const state = ref(isEditing.value ? {
-  type: transaction.type,
-  amount: transaction.amount,
-  created_at: transaction.created_at.split('T')[0],
-  description: transaction.description,
-  category: transaction.category
-} : { ...initialState })
+const state = ref({ ...initialState })
 
 const resetForm = () => {
   Object.assign(state.value, initialState)
