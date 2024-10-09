@@ -120,7 +120,7 @@ const initialState = {
 const state = ref(isEditing.value ? {
   type: transaction.type,
   amount: transaction.amount,
-  created_at: transaction.created_at,
+  created_at: transaction.created_at.split('T')[0],
   description: transaction.description,
   category: transaction.category
 } : { ...initialState })
